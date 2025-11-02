@@ -23,6 +23,7 @@ It's domain-agnostic and works with any people-events data:
 - **K-Anonymity**: Ensures minimum group sizes
 - **Differential Privacy**: Mathematical privacy guarantees
 - **Population-Level Traceability**: Measures re-identification risk
+- **Census-Enhanced Privacy**: Uses public demographic data for accurate risk assessment
 - **Automatic Risk Mitigation**: Adjusts protection until safe
 
 ### 📊 Preserves Statistical Utility
@@ -231,6 +232,54 @@ Outcomes: approved, denied, completed, compliant, etc.
 ### Employment
 Events: hire, promotion, performance_review, training, termination, etc.
 Outcomes: successful, promoted, completed, terminated, etc.
+
+## 📈 Census-Enhanced Privacy Assessment
+
+PersonaTwin automatically uses **public demographic data** to improve privacy assessment - no manual data collection required!
+
+### How It Works
+
+1. **Automatic Census Data Fetching**
+   - Connects to US Census Bureau API (free, no auth required)
+   - Downloads real demographic distributions for geographic areas
+   - Caches data locally in `~/.personatwin/census_cache`
+
+2. **Enhanced Risk Calculation**
+   - Detects rare demographic combinations using real population data
+   - Calculates realistic external linkage risk
+   - Identifies vulnerable populations automatically
+
+3. **Fallback System**
+   - Works offline with bundled synthetic census data
+   - Uses US national averages when API unavailable
+   - Conservative estimates ensure safety
+
+### Usage
+
+```python
+import personatwin as pt
+
+# Census enhancement enabled by default
+result = pt.create_safe_personas(
+    data=your_data,
+    privacy_level="high",
+    use_census_data=True  # Enabled by default
+)
+
+# Check for census insights in the report
+if "CENSUS:" in result.risk_metrics.recommendation:
+    print("Census-enhanced privacy assessment detected rare demographics")
+```
+
+### Data Sources
+
+- **Primary**: [US Census Bureau API](https://www.census.gov/data/developers/data-sets.html)
+- **Cache**: `~/.personatwin/census_cache/` (automatically created)
+- **Fallback**: Bundled US national demographic averages
+
+**No API keys or manual downloads required!** The system handles everything automatically.
+
+See `examples/census_enhanced_example.py` for a complete demonstration.
 
 ## 🤖 LLM Integration (Optional)
 

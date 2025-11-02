@@ -16,6 +16,13 @@ Domain-agnostic system supporting:
 from personatwin.models import Person, Event, Persona, Demographics, EventPatterns, PrivacyMetadata
 from personatwin.privacy import PrivacyLevel, RiskMetrics, PopulationTraceability
 from personatwin.domains import Domain, DomainConfig, get_domain_config, create_custom_config
+
+# Optional census module
+try:
+    from personatwin.census import CensusEnhancedPrivacyCalculator, CensusDataProvider, CensusData
+    _CENSUS_AVAILABLE = True
+except ImportError:
+    _CENSUS_AVAILABLE = False
 from personatwin.domains import (
     CRIMINAL_JUSTICE_CONFIG,
     HEALTHCARE_CONFIG,

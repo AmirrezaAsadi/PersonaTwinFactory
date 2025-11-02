@@ -6,6 +6,7 @@ This module implements:
 - Privacy level definitions
 - Population-level traceability measurement
 - Automatic risk mitigation strategies
+- Census-enhanced privacy assessment using public data
 """
 
 from dataclasses import dataclass, field
@@ -13,6 +14,16 @@ from typing import Dict, List, Optional
 from enum import Enum
 import numpy as np
 from collections import Counter
+import logging
+
+# Try to import census module
+try:
+    from .census import CensusEnhancedPrivacyCalculator, create_census_enhanced_calculator
+    CENSUS_AVAILABLE = True
+except ImportError:
+    CENSUS_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
 
 
 class PrivacyLevel(Enum):
@@ -88,11 +99,30 @@ class PopulationTraceability:
     - Event pattern uniqueness
     - K-anonymity
     - External linkage risks
+    
+    Can optionally use census data for enhanced privacy assessment.
     """
     
-    def __init__(self, privacy_level: PrivacyLevel = PrivacyLevel.MEDIUM):
+    def __init__(
+        self, 
+        privacy_level: PrivacyLevel = PrivacyLevel.MEDIUM,
+        use_census_data: bool = True
+    ):
         self.privacy_level = privacy_level
         self.risk_weights = self._get_risk_weights()
+        self.use_census_data = use_census_data
+        self.census_calculator = None
+        
+        # Initialize census calculator if available and enabled
+        if use_census_data and CENSUS_AVAILABLE:
+            try:
+                self.census_calculator = create_census_enhanced_calculator()
+                logger.info("Census-enhanced privacy assessment enabled")
+            except Exception as e:
+                logger.warning(f"Failed to initialize census calculator: {e}")
+                self.census_calculator = None
+        elif use_census_data and not CENSUS_AVAILABLE:
+            logger.warning("Census module not available. Using basic privacy assessment.")
     
     def _get_risk_weights(self) -> Dict[str, float]:
         """Get risk component weights based on privacy level."""
@@ -167,14 +197,38 @@ class PopulationTraceability:
         # Calculate k-anonymity
         k_anonymity = self._calculate_k_anonymity(personas)
         
+        # Enhance with census data if available
+        census_enhanced_metrics = {}
+        if self.census_calculator:
+            try:
+                census_enhanced_metrics = self.census_calculator.enhance_risk_metrics(
+                    personas, None  # Will create basic metrics internally
+                )
+                # Update external risk with census-enhanced version if available
+                if "census_enhanced_external_risk" in census_enhanced_metrics:
+                    external_risk = census_enhanced_metrics["census_enhanced_external_risk"]
+                    logger.info("Using census-enhanced external linkage risk")
+            except Exception as e:
+                logger.warning(f"Census enhancement failed: {e}")
+        
         # Generate recommendation
         recommendation = self._generate_recommendation(
-            population_avg_risk, high_risk_personas, k_anonymity
+            float(population_avg_risk), high_risk_personas, k_anonymity
         )
+        
+        # Add census recommendation if available
+        if self.census_calculator and census_enhanced_metrics:
+            try:
+                census_rec = self.census_calculator.get_recommendation_with_census(
+                    personas, None, float(population_avg_risk)
+                )
+                recommendation = f"{recommendation} | CENSUS: {census_rec}"
+            except Exception as e:
+                logger.warning(f"Census recommendation failed: {e}")
         
         return RiskMetrics(
             individual_risks=individual_risks,
-            population_average_risk=population_avg_risk,
+            population_average_risk=float(population_avg_risk),
             high_risk_personas=high_risk_personas,
             demographic_concentration_risk=demographic_risk,
             event_pattern_concentration_risk=event_pattern_risk,
@@ -328,7 +382,7 @@ class PopulationTraceability:
         
         # Average external risk across all personas
         risks = [self._calculate_persona_external_risk(p) for p in personas]
-        return np.mean(risks)
+        return float(np.mean(risks))
     
     def _calculate_k_anonymity(self, personas: List['Persona']) -> int:  # type: ignore
         """Calculate minimum group size (k-anonymity)."""

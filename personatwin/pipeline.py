@@ -34,6 +34,7 @@ class ProcessingConfig:
     domain_config: Optional[DomainConfig] = None
     enable_llm: bool = False
     llm_config: Optional[LLMConfig] = None
+    use_census_data: bool = True  # Use public census data for enhanced privacy
     max_iterations: int = 5  # Maximum privacy adjustment iterations
     min_k_anonymity: int = 5
 
@@ -99,7 +100,8 @@ class PersonaTwinPipeline:
             privacy_level=self.config.privacy_level
         )
         self.risk_calculator = PopulationTraceability(
-            privacy_level=self.config.privacy_level
+            privacy_level=self.config.privacy_level,
+            use_census_data=self.config.use_census_data
         )
         self.privacy_adjuster = AutoPrivacyAdjustment(
             privacy_level=self.config.privacy_level

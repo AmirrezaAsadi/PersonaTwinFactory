@@ -22,6 +22,7 @@ def create_safe_personas(
     target_risk: float = 0.05,
     enable_llm: bool = False,
     llm_api_key: Optional[str] = None,
+    use_census_data: bool = True,
 ) -> ProcessingResult:
     """
     Generate privacy-protected personas from people-events data.
@@ -38,6 +39,7 @@ def create_safe_personas(
         target_risk: Target population re-identification risk (default 5%)
         enable_llm: Use LLM for intelligent privacy decisions
         llm_api_key: OpenAI API key (or set OPENAI_API_KEY env var)
+        use_census_data: Use public census data for enhanced privacy assessment (default True)
         
     Returns:
         ProcessingResult with personas and risk metrics
@@ -87,6 +89,7 @@ def create_safe_personas(
         domain=domain,
         domain_config=domain_config,
         enable_llm=enable_llm,
+        use_census_data=use_census_data,
     )
     
     if enable_llm and llm_api_key:

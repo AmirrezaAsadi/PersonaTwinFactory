@@ -2,7 +2,7 @@
 
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -73,7 +73,7 @@ class PersonaTwin:
             if hasattr(self.attributes, key):
                 setattr(self.attributes, key, value)
 
-        self.attributes.updated_at = datetime.utcnow()
+        self.attributes.updated_at = datetime.now(timezone.utc)
 
         # Log the update
         self.transparency_logger.log_operation(
@@ -167,7 +167,7 @@ class PersonaTwin:
         Returns:
             DataSnapshot object with current state
         """
-        snapshot_id = f"{self.persona_id}_snapshot_{datetime.utcnow().timestamp()}"
+        snapshot_id = f"{self.persona_id}_snapshot_{datetime.now(timezone.utc).timestamp()}"
 
         snapshot = DataSnapshot(
             snapshot_id=snapshot_id,
@@ -206,7 +206,7 @@ class PersonaTwin:
         data = {
             "attributes": self.attributes.model_dump(),
             "behaviors": [b.model_dump() for b in self.behaviors],
-            "saved_at": datetime.utcnow().isoformat(),
+            "saved_at": datetime.now(timezone.utc).isoformat(),
         }
 
         with open(file_path, "w") as f:

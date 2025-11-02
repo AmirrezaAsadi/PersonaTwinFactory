@@ -1,6 +1,6 @@
 """Data models for Digital Persona Twin attributes and behaviors."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 
@@ -18,10 +18,10 @@ class PersonaAttributes(BaseModel):
         default_factory=dict, description="Personality traits and characteristics"
     )
     created_at: datetime = Field(
-        default_factory=datetime.utcnow, description="Timestamp of creation"
+        default_factory=lambda: datetime.now(timezone.utc), description="Timestamp of creation"
     )
     updated_at: datetime = Field(
-        default_factory=datetime.utcnow, description="Timestamp of last update"
+        default_factory=lambda: datetime.now(timezone.utc), description="Timestamp of last update"
     )
 
     class Config:
@@ -40,7 +40,7 @@ class PersonaBehavior(BaseModel):
     )
     response: Optional[str] = Field(None, description="Response or action taken")
     timestamp: datetime = Field(
-        default_factory=datetime.utcnow, description="When the behavior occurred"
+        default_factory=lambda: datetime.now(timezone.utc), description="When the behavior occurred"
     )
     metadata: Dict[str, Any] = Field(
         default_factory=dict, description="Additional metadata"
@@ -62,7 +62,7 @@ class DataSnapshot(BaseModel):
         default_factory=list, description="Recent behaviors"
     )
     snapshot_timestamp: datetime = Field(
-        default_factory=datetime.utcnow, description="When snapshot was created"
+        default_factory=lambda: datetime.now(timezone.utc), description="When snapshot was created"
     )
     checksum: Optional[str] = Field(None, description="Data integrity checksum")
 

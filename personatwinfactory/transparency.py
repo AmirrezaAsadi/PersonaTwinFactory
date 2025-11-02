@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from cryptography.fernet import Fernet
@@ -16,7 +16,7 @@ class AuditLog(BaseModel):
     operation: str = Field(..., description="Type of operation (create, read, update, delete)")
     persona_id: str = Field(..., description="ID of the persona affected")
     timestamp: datetime = Field(
-        default_factory=datetime.utcnow, description="When the operation occurred"
+        default_factory=lambda: datetime.now(timezone.utc), description="When the operation occurred"
     )
     user_id: Optional[str] = Field(None, description="User who performed the operation")
     data_hash: str = Field(..., description="Hash of the data for integrity verification")
@@ -95,14 +95,14 @@ class TransparencyLogger:
         Returns:
             The created audit log entry
         """
-        log_id = f"{persona_id}_{operation}_{datetime.utcnow().timestamp()}"
+        log_id = f"{persona_id}_{operation}_{datetime.now(timezone.utc).timestamp()}"
         data_hash = self.compute_hash(data)
 
         audit_log = AuditLog(
             log_id=log_id,
             operation=operation,
             persona_id=persona_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             user_id=user_id,
             data_hash=data_hash,
             details=details or {},

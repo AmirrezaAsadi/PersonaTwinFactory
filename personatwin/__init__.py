@@ -23,6 +23,21 @@ try:
     _CENSUS_AVAILABLE = True
 except ImportError:
     _CENSUS_AVAILABLE = False
+
+# Optional social network module
+try:
+    from personatwin.social_network import (
+        SocialNetworkBuilder,
+        SocialNetworkAnalyzer,
+        SocialConnection,
+        SocialCircle,
+        ConnectionType,
+        ConnectionStrength,
+        add_social_network
+    )
+    _SOCIAL_NETWORK_AVAILABLE = True
+except ImportError:
+    _SOCIAL_NETWORK_AVAILABLE = False
 from personatwin.domains import (
     CRIMINAL_JUSTICE_CONFIG,
     HEALTHCARE_CONFIG,

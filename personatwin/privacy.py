@@ -55,6 +55,7 @@ class RiskMetrics:
     Comprehensive risk assessment for generated personas.
     
     Measures both individual and population-level re-identification risks.
+    Includes network-specific risks when social networks are present.
     """
     individual_risks: Dict[str, float] = field(default_factory=dict)  # persona_id -> risk
     population_average_risk: float = 0.0
@@ -62,6 +63,9 @@ class RiskMetrics:
     demographic_concentration_risk: float = 0.0
     event_pattern_concentration_risk: float = 0.0
     external_linkage_risk: float = 0.0
+    network_hub_risk: float = 0.0  # Risk from network hubs
+    network_isolation_risk: float = 0.0  # Risk from isolated groups
+    network_overall_risk: float = 0.0  # Combined network risk
     recommendation: str = "UNKNOWN"
     k_anonymity: int = 0  # Minimum group size
     
@@ -78,7 +82,7 @@ class RiskMetrics:
     
     def to_dict(self) -> Dict:
         """Convert to dictionary."""
-        return {
+        result = {
             "population_average_risk": self.population_average_risk,
             "risk_level": self.get_risk_level(),
             "high_risk_count": len(self.high_risk_personas),
@@ -88,6 +92,19 @@ class RiskMetrics:
             "recommendation": self.recommendation,
             "k_anonymity": self.k_anonymity,
         }
+        
+        # Include network risks if present
+        if self.network_overall_risk > 0:
+            result.update({
+                "network_hub_risk": self.network_hub_risk,
+                "network_isolation_risk": self.network_isolation_risk,
+                "network_overall_risk": self.network_overall_risk,
+                "combined_risk_with_network": (
+                    self.population_average_risk * 0.7 + self.network_overall_risk * 0.3
+                )
+            })
+        
+        return result
 
 
 class PopulationTraceability:

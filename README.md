@@ -28,6 +28,7 @@ It's domain-agnostic and works with any people-events data:
 
 ### 📊 Preserves Statistical Utility
 - Maintains demographic distributions for bias analysis
+- **Social Network Support**: Preserves relationship structures and community patterns
 - Preserves outcome patterns and correlations
 - Enables meaningful research on protected data
 - Configurable privacy-utility trade-offs

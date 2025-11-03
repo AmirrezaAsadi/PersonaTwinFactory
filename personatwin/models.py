@@ -119,6 +119,8 @@ class Person:
     person_id: str
     demographics: Demographics
     events: List[Event] = field(default_factory=list)
+    connections: List[str] = field(default_factory=list)  # IDs of connected people
+    social_circle_ids: List[str] = field(default_factory=list)  # Community/group memberships
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -203,6 +205,10 @@ class Persona:
     event_patterns: EventPatterns
     privacy_metadata: PrivacyMetadata
     events: List[Event] = field(default_factory=list)  # Combined events from merged people
+    connections: List[str] = field(default_factory=list)  # IDs of connected personas
+    connection_count: int = 0  # Approximate number of connections (with noise)
+    social_circles: List[str] = field(default_factory=list)  # Community memberships
+    merged_person_ids: List[str] = field(default_factory=list)  # Track which people were merged
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""

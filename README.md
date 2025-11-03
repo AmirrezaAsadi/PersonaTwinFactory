@@ -29,6 +29,7 @@ It's domain-agnostic and works with any people-events data:
 ### 📊 Preserves Statistical Utility
 - Maintains demographic distributions for bias analysis
 - **Social Network Support**: Preserves relationship structures and community patterns
+- **External Dataset Integration**: Can use real network patterns from Stanford SNAP and other sources
 - Preserves outcome patterns and correlations
 - Enables meaningful research on protected data
 - Configurable privacy-utility trade-offs
@@ -83,7 +84,7 @@ pip install personatwin
 import personatwin as pt
 import pandas as pd
 
-# Load court records
+# Load your court records
 df = pd.read_csv("court_records.csv")
 
 # Generate personas with high privacy
@@ -281,6 +282,52 @@ if "CENSUS:" in result.risk_metrics.recommendation:
 **No API keys or manual downloads required!** The system handles everything automatically.
 
 See `examples/census_enhanced_example.py` for a complete demonstration.
+
+## 🌐 Synthetic Persona Augmentation (Planned)
+
+PersonaTwin will support augmenting your real data with synthetic personas to **dramatically increase anonymity**:
+
+### The Concept
+
+Add synthetic (fake) people to your dataset so real people blend in better!
+
+```python
+# Your dataset: 100 real people with some rare demographics
+# Problem: Only 5 people in zipcode 45201 (k=5, risky)
+
+# Solution: Add 200 synthetic personas
+result = pt.create_safe_personas(
+    data=your_data,  # 100 real people
+    privacy_level="high",
+    augment_with_synthetic=True,  # Add synthetics
+    synthetic_source="nemotron",  # NVIDIA's synthetic personas
+    synthetic_ratio=2.0  # 2x synthetic
+)
+
+# Result: 300 personas (100 real + 200 synthetic)
+# Now 20 people in zipcode 45201 (k=20, much safer!)
+# Adversary can't tell which are real vs synthetic
+```
+
+### Planned Features
+
+- **NVIDIA Nemotron Integration**: 20,000+ diverse synthetic personas with demographics and zipcodes
+- **Census-Based Generation**: Generate synthetics on-the-fly from Census distributions
+- **Three Strategies**:
+  - `match_distribution`: Balance across all demographics
+  - `fill_gaps`: Fill missing geographic areas
+  - `boost_rare`: Target vulnerable rare demographics
+- **Transparent Tracking**: Know which personas are synthetic vs real
+- **No Privacy Risk**: Synthetics are fake, so no privacy concerns
+
+### Benefits
+
+✅ **2-5x increase in k-anonymity**
+✅ **Rare demographics become common**
+✅ **Geographic coverage gaps filled**
+✅ **Plausible deniability** (real people hidden among synthetics)
+
+See `EXTERNAL_DATASETS_INTEGRATION.md` and `SYNTHETIC_AUGMENTATION_SUMMARY.md` for full details.
 
 ## 🤖 LLM Integration (Optional)
 

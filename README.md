@@ -1,11 +1,11 @@
-# PersonaTwin: Privacy-Preserving Persona Generation
+# PersonaTwinFactory: Privacy-Preserving Persona Generation
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Transform sensitive people-events datasets into shareable personas while preserving statistical utility and ensuring privacy.**
 
-## 🎯 What is PersonaTwin?
+## 🎯 What is PersonaTwin Factory?
 
 PersonaTwin is a Python package that solves a critical problem: **How to safely share and analyze sensitive user data while protecting individual privacy**.
 

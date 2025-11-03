@@ -5,7 +5,7 @@
 
 **Transform sensitive people-events datasets into shareable personas while preserving statistical utility and ensuring privacy.**
 
-## 🎯 What is PersonaTwin?
+## 🎯 What is PersonaTwin Factory?
 
 PersonaTwin is a Python package that solves a critical problem: **How to safely share and analyze sensitive user data while protecting individual privacy**.
 

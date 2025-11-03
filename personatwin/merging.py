@@ -11,6 +11,8 @@ import uuid
 
 from personatwin.models import Person, Persona, Demographics, EventPatterns, PrivacyMetadata
 from personatwin.privacy import PrivacyLevel
+from personatwin.event_merging import IntelligentEventMerger, EventMergingStrategy
+from personatwin.domains import Domain
 
 
 # Merging configuration
@@ -35,11 +37,15 @@ class PeopleMerging:
     def __init__(
         self,
         privacy_level: PrivacyLevel = PrivacyLevel.MEDIUM,
-        min_group_size: int = 5
+        min_group_size: int = 5,
+        domain: Domain = Domain.CUSTOM,
+        event_merging_strategy: EventMergingStrategy = EventMergingStrategy.SIMILARITY
     ):
         self.privacy_level = privacy_level
         self.min_group_size = min_group_size
+        self.domain = domain
         self.criteria = self._get_merging_criteria()
+        self.event_merger = IntelligentEventMerger(domain, event_merging_strategy)
     
     def _get_merging_criteria(self) -> Dict:
         """Get merging criteria based on privacy level."""
@@ -158,13 +164,11 @@ class PeopleMerging:
         # Merge demographics
         demographics = self._merge_demographics([p.demographics for p in group])
         
-        # Combine all events
-        all_events = []
-        for person in group:
-            all_events.extend(person.events)
+        # Use intelligent event merging instead of naive concatenation
+        merged_events = self.event_merger.merge_events(group)
         
         # Extract event patterns
-        event_patterns = self._extract_event_patterns(all_events)
+        event_patterns = self._extract_event_patterns(merged_events)
         
         # Create privacy metadata
         privacy_metadata = PrivacyMetadata(
@@ -180,7 +184,8 @@ class PeopleMerging:
             demographics=demographics,
             event_patterns=event_patterns,
             privacy_metadata=privacy_metadata,
-            events=all_events
+            events=merged_events,
+            merged_person_ids=[p.person_id for p in group]
         )
     
     def _merge_demographics(self, demographics_list: List[Demographics]) -> Demographics:
